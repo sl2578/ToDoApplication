@@ -11,20 +11,41 @@
         	<dt>Title:
         	<dd><input type=text size=30 name=title>
        		<dt>Text:
-        	<dd><textarea name=text rows=5 cols=40></textarea>
+        	<dd><textarea name=descr rows=5 cols=40></textarea>
         	<dd><input type=submit value=Share>
       		</dl>
     	</form>
     	
-      <h2>Output</h2>
+      <h2>Incomplete Tasks</h2>
       {% for task in tasks %}	
-        <li><h2>{{ task.title }}</h2> {{ task.text|safe }}
-        <form action="{{ url_for('delete_task') }}" method=post class=delete-task>
-          <input type=hidden value="{{ task.id }}"name=task_to_delete></input>
-          <input type=submit></input>
-        </form>
+        {% if task.done == 0 %}
+          <li><h2>{{ task.title }}</h2> {{ task.descr|safe }}
+          <form action="{{ url_for('delete_task') }}" method=post class=delete-task>
+            <input type=hidden value="{{ task.id }}"name=task_to_delete></input>
+            <input type=submit></input>
+          </form>
+          <form action="{{ url_for('move_task') }}" method=post class=move-task>
+            <input type=hidden value="{{ task.id }}"name=task_to_move></input>
+            <input type=submit></input>
+          </form>
+        {% endif %}
       {% else %}
         <li><em>Unbelievable.  No entries here so far</em>
       {% endfor %}
+
+       <h2>Completed Tasks</h2>
+      {% for task in tasks %} 
+        {% if task.done == 1 %}
+          <li><h2>{{ task.title }}</h2> {{ task.descr|safe }}
+          <form action="{{ url_for('delete_task') }}" method=post class=delete-task>
+            <input type=hidden value="{{ task.id }}"name=task_to_delete></input>
+            <input type=submit></input>
+          </form>
+        {% endif %}
+      {% else %}
+        <li><em>Unbelievable.  No entries here so far</em>
+      {% endfor %}
+
+
     </body>  
 </html>
