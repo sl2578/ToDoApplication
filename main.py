@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 
-# HELPER METHODS
+# SETTING UP THE DB
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
@@ -38,8 +38,8 @@ def teardown_request(exception):
 # ROUTES
 @app.route("/")
 def index():
-    cur = g.db.execute('select title, text from entries order by id desc')
-    tasks = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
+    cur = g.db.execute('select id, title, text from entries order by id desc')
+    tasks = [dict(id=row[0], title=row[1], text=row[2]) for row in cur.fetchall()]
     return render_template('index.html', tasks=tasks)
 
 @app.route('/add', methods=['POST'])
@@ -50,7 +50,6 @@ def add_entry():
 
 @app.route('/delete', methods=['POST'])
 def delete_task():
-    print str(request.form['task_to_delete'])
     g.db.execute('delete from entries where id = ?', [request.form['task_to_delete']])
     g.db.commit()
     return redirect(url_for('index'))
