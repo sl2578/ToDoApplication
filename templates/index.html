@@ -1,51 +1,93 @@
 <!doctype html>  
 <html>  
-	<head>  
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
-		<title>To-do List</title>  
-	</head>  
-	<body>  
-		<h2>2du</h2> 
-		<form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-      		<dl>
-        	<dt>Title:
-        	<dd><input type=text size=30 name=title>
-       		<dt>Text:
-        	<dd><textarea name=descr rows=5 cols=40></textarea>
-        	<dd><input type=submit value=Share>
-      		</dl>
-    	</form>
-    	
-      <h2>Incomplete Tasks</h2>
-      {% for task in tasks %}	
-        {% if task.done == 0 %}
-          <li><h2>{{ task.title }}</h2> {{ task.descr|safe }}
-          <form action="{{ url_for('delete_task') }}" method=post class=delete-task>
-            <input type=hidden value="{{ task.id }}"name=task_to_delete></input>
-            <input type=submit></input>
-          </form>
-          <form action="{{ url_for('move_task') }}" method=post class=move-task>
-            <input type=hidden value="{{ task.id }}"name=task_to_move></input>
-            <input type=submit></input>
-          </form>
-        {% endif %}
-      {% else %}
-        <li><em>Unbelievable.  No entries here so far</em>
-      {% endfor %}
+    <head>  
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <script src="../static/js/hideshow.js"></script>
+        <title>To-do App</title>  
+    </head>  
+    <body>
+    <div id="page-wrapper">     
+        <h1>To Do Application</h1> 
+        <br><br>
+        <!-- Show add new task form -->
+        <a href="#" id="add-show" class="showLink" 
+        onclick="showHide('add');return false;"><img src="../static/img/plus.png"> 
+        Add New Task</a>
+        <div id="add" class="more">
+            <!-- New task input form -->
+            <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+                <dl>
+                    <dt>Title:
+                    <dd><input type=text size=30 name=title>
+                    <dt>Description:
+                    <dd><textarea name=descr rows=5 cols=40></textarea>
+                    <dt>Deadline (YYYY-MM-DD HH:MM):
+                    <dd><textarea name=dline type=datetime></textarea>
+                    <dd><input type=submit value=Add>
+                </dl>
+            </form>
+            <!-- Hide add new task form -->
+            <p><a href="#" id="add-hide" class="hideLink" 
+            onclick="showHide('add');return false;">Cancel</a></p>
+        </div>
+        <br><br><br>
+        <div id="left_col">
+            <h2>Incomplete Tasks</h2>
 
-       <h2>Completed Tasks</h2>
-      {% for task in tasks %} 
-        {% if task.done == 1 %}
-          <li><h2>{{ task.title }}</h2> {{ task.descr|safe }}
-          <form action="{{ url_for('delete_task') }}" method=post class=delete-task>
-            <input type=hidden value="{{ task.id }}"name=task_to_delete></input>
-            <input type=submit></input>
-          </form>
-        {% endif %}
-      {% else %}
-        <li><em>Unbelievable.  No entries here so far</em>
-      {% endfor %}
+            {% for task in tasks %}   
+                <!-- Filter out incomplete tasks -->
+                {% if task.done == 0 %} 
+                    <details> <!-- Click title to details and deadlines -->
+                        <summary>{{ task.title }}</summary> 
+                        <p><b>Description:</b>
+                            {{ task.descr|safe }}<br>
+                            <b>Deadline:</b>
+                            {{ task.dline }}
+                        </p>
+                        <!-- Delete button -->
+                        <form action="{{ url_for('delete_task') }}" method=post class=delete-task> 
+                            <input type=hidden value="{{ task.id }}"name=task_to_delete></input>
+                            <input type=submit value=Delete id="delete"></input>
+                        </form>
+                        <!-- Mark as complete -->
+                        <form action="{{ url_for('move_task') }}" method=post class=move-task> 
+                            <input type=hidden value="{{ task.id }}"name=task_to_move></input>
+                            <input type=submit value='Completed' id="complete"></input>
+                        </form>
+                    </details>
+                {% endif %}
+            {% else %}
+                <em>You currently have no tasks to do!</em>
+            {% endfor %}
+        </div>
 
+        <div id="right_col">
+            <h2>Completed Tasks</h2>
+            {% for task in tasks %} 
+                {% if task.done == 1 %}
+                    <details> <!-- Click title to see more -->
+                        <summary>{{ task.title }}</summary> 
+                        <p><b>Description:</b>
+                        {{ task.descr|safe }}<br>
+                        <b>Time Completed:</b>
+                        {{ task.finish }}</p>
+                        <!-- Delete button -->
+                        <form action="{{ url_for('delete_task') }}" method=post class=delete-task> 
+                            <input type=hidden value="{{ task.id }}"name=task_to_delete></input>
+                            <input type=submit value=Delete></input>
+                        </form>
+                    </details>
+                {% endif %}
+            {% else %}
+                <em>No tasks have yet been completed!</em>
+            {% endfor %}
+        </div>
 
+        <div id="footer">
+            <br><br>
+        </div>
+
+    </div>
     </body>  
 </html>
